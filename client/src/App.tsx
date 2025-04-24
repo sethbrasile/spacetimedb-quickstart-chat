@@ -142,6 +142,25 @@ function App() {
     );
   }, []);
 
+  useEffect(() => {
+    if (!conn) return;
+    conn.db.user.onInsert((_ctx, user) => {
+      if (user.online) {
+        const name = user.name || user.identity.toHexString().substring(0, 8);
+        setSystemMessage(prev => prev + `\n${name} has connected.`);
+      }
+    });
+    conn.db.user.onUpdate((_ctx, oldUser, newUser) => {
+      const name =
+        newUser.name || newUser.identity.toHexString().substring(0, 8);
+      if (oldUser.online === false && newUser.online === true) {
+        setSystemMessage(prev => prev + `\n${name} has connected.`);
+      } else if (oldUser.online === true && newUser.online === false) {
+        setSystemMessage(prev => prev + `\n${name} has disconnected.`);
+      }
+    });
+  }, [conn]);
+
   const prettyMessages: PrettyMessage[] = messages
     .sort((a, b) => (a.sent > b.sent ? 1 : -1))
     .map(message => ({
