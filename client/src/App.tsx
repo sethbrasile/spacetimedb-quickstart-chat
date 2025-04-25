@@ -132,7 +132,7 @@ function App() {
 
     setConn(
       DbConnection.builder()
-        .withUri('ws://localhost:3000')
+        .withUri(import.meta.env.VITE_SPACETIME_URI || 'ws://localhost:3000')
         .withModuleName('quickstart-chat')
         .withToken(localStorage.getItem('auth_token') || '')
         .onConnect(onConnect)
